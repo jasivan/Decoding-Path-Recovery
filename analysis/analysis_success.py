@@ -154,7 +154,7 @@ def build_dataset_tables(matrix, all_models):
     return pd.DataFrame(t1_records), pd.DataFrame(t2_records), pd.DataFrame(t3_records)
 
 def generate_csv_report():
-    file_pattern = os.path.join(DATA_DIR, "inference_data_*.json")
+    file_pattern = os.path.join(DATA_DIR, "*.json")
     files = glob.glob(file_pattern)
     hard_matrix, fixed_matrix = {}, {}   
     

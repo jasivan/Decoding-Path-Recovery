@@ -33,7 +33,7 @@ def clean_subgroup_string(raw_val):
 def parse_dataset_features(data_dir="evaluation_results"):
     """Sweeps json logs and filters strictly for Symbolic Equation formats."""
     records = []
-    file_pattern = os.path.join(data_dir, "inference_data_*.json")
+    file_pattern = os.path.join(data_dir, "*.json")
     files = glob.glob(file_pattern)
     
     for file_path in files:
@@ -43,7 +43,7 @@ def parse_dataset_features(data_dir="evaluation_results"):
             model_name = "Qwen3-14B"
             
         # Isolate Symbolic Equation format logs exclusively
-        if file_name.endswith("FERMAT_hard.json") and file_name.startswith("inference_data_"):
+        if file_name.endswith("FERMAT_hard.json"):
             format_type = "Symbolic_Equation"
         else:
             continue

@@ -11,6 +11,8 @@ env/
 evaluation_results/*.json
 evaluation_results/*.csv
 evaluation_results/*.png
+!evaluation_results/llama-3.2-1b-instruct_FERMAT_hard.json
+!evaluation_results/llama-3.2-1b-instruct_FERMAT_hard_question_fixed.json
 *.log
 slurm-*.out
 

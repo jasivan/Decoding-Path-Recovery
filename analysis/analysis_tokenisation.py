@@ -46,7 +46,7 @@ def normalize_model_name(raw_name):
 def parse_tokenization_features(data_dir="."):
     """Sweeps json logs to extract gold digit counts, operational accuracy, and subgroups."""
     records = []
-    file_pattern = os.path.join(data_dir, "inference_data_*.json")
+    file_pattern = os.path.join(data_dir, "*.json")
     files = glob.glob(file_pattern)
     
     for file_path in files:

@@ -32,7 +32,7 @@ def clean_subgroup_string(raw_val):
 def parse_dataset_features(data_dir="evaluation_results"):
     """Sweeps json logs and maps exact base_str_match, ml_str_match, and tk_str_match keys."""
     records = []
-    file_pattern = os.path.join(data_dir, "inference_data_*.json")
+    file_pattern = os.path.join(data_dir, "*.json")
     files = glob.glob(file_pattern)
     
     for file_path in files:
@@ -41,9 +41,9 @@ def parse_dataset_features(data_dir="evaluation_results"):
         if not model_name or model_name.endswith(".json"):
             model_name = "Qwen3-14B"
             
-        if file_name.endswith("FERMAT_hard_question_fixed.json") and file_name.startswith("inference_data_"):
+        if file_name.endswith("FERMAT_hard_question_fixed.json"):
             format_type = "Worded_Question"
-        elif file_name.endswith("FERMAT_hard.json") and file_name.startswith("inference_data_"):
+        elif file_name.endswith("FERMAT_hard.json"):
             format_type = "Symbolic_Equation"
         else:
             continue

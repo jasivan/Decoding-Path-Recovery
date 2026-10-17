@@ -24,7 +24,7 @@ def parse_multi_model_normalized_layers(data_dir="."):
     and normalizes layer depth into relative percentages (0-100%).
     """
     records = []
-    file_pattern = os.path.join(data_dir, "inference_data_*.json")
+    file_pattern = os.path.join(data_dir, "*.json")
     files = glob.glob(file_pattern)
     
     raw_entries = []

@@ -219,8 +219,8 @@ def execute_paired_tests(baseline_bin, oracle_bin, baseline_dig, oracle_dig, bas
 # =========================================================================
 def run_granular_statistical_analysis(data_dir="evaluation_results"):
     scenarios = {
-        "Worded Questions (Fixed Set)": os.path.join(data_dir, "inference_*_fixed.json"),
-        "Symbolic Equations (Hard Set)": os.path.join(data_dir, "inference_*_hard.json")
+        "Worded Questions (Fixed Set)": os.path.join(data_dir, "*_fixed.json"),
+        "Symbolic Equations (Hard Set)": os.path.join(data_dir, "*_hard.json")
     }
     
     strict_model_order = [

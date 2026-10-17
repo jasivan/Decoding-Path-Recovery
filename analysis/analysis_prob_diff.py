@@ -24,7 +24,7 @@ def parse_margin_metrics(data_dir="evaluation_results"):
        and the specific Chosen vs. Gold token discrepancy for incorrect tracking paths.
     """
     records = []
-    file_pattern = os.path.join(data_dir, "inference_data_*.json")
+    file_pattern = os.path.join(data_dir, "*.json")
     files = glob.glob(file_pattern)
     
     for file_path in files:

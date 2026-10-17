@@ -16,7 +16,7 @@ DESIRED_MODEL_ORDER = [
 ]
 
 def calculate_tk_rank_impact(data_dir="evaluation_results"):
-    file_pattern = os.path.join(data_dir, "inference_data_*_hard.json")
+    file_pattern = os.path.join(data_dir, "*_hard.json")
     files = glob.glob(file_pattern)
     
     # Store lists of outcomes per model

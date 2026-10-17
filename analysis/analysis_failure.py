@@ -22,7 +22,7 @@ def analyze_rank_distributions(data_dir="evaluation_results"):
        separately for First, Middle, and End token failure types.
     """
     rank_counters = {}
-    file_pattern = os.path.join(data_dir, "inference_data_*.json")
+    file_pattern = os.path.join(data_dir, "*.json")
     files = glob.glob(file_pattern)
     
     for file_path in files:

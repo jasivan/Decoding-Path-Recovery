@@ -10,7 +10,7 @@ def extract_specific_comparison_data(data_dir="evaluation_results"):
     prob_records = []
     layer_acc_records = []
     
-    file_pattern = os.path.join(data_dir, "inference_data_*.json")
+    file_pattern = os.path.join(data_dir, "*.json")
     files = glob.glob(file_pattern)
     
     target_models = ["Qwen3-8B", "Llama-3.1-8B-Instruct"]
