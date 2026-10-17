@@ -63,7 +63,7 @@ For questions about the paper or this repository, contact:
 	booktitle = "Proceedings of the 19th International Natural Language Generation Conference",
 	month = oct,
 	year = "2026",
-	address = "Sheffield, UK",
+	address = "Utrecht, the Netherlands",
 	pages = "799--814",
 	publisher = "Association for Computational Linguistics",
 	url = "https://2026.inlgmeeting.org/static/proceedings/long/watermarked_pdfs/45.pdf"

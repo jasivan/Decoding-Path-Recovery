@@ -14,6 +14,8 @@ def parse_args():
     parser.add_argument("--dataset", type=str, default="FERMAT_all.json")
     parser.add_argument("--max_new_tokens", type=int, default=16)
     parser.add_argument("--top_k", type=int, default=5)
+    parser.add_argument("--subgroup_size", type=int, default=531,
+                        help="Number of valid dataset examples in each fixed-order subgroup.")
     parser.add_argument("--type", type=str, default="question")
     parser.add_argument("--output_file", type=str, default=None, 
                         help="Optional explicit output path. If None, it will be generated dynamically.")
@@ -22,15 +24,19 @@ def parse_args():
     if args.output_file is None:
         model_clean = args.model.split("/")[-1]
         dataset_clean = os.path.splitext(os.path.basename(args.dataset))[0]
-        args.output_file = f"inference_eos/inference_data_{model_clean}_{dataset_clean}_{args.type}.json"
+        args.output_file = f"inference_eos_uni/inference_data_{model_clean}_{dataset_clean}_{args.type}.json"
+
+    if args.top_k < 1:
+        parser.error("--top_k must be at least 1")
+    if args.subgroup_size < 1:
+        parser.error("--subgroup_size must be at least 1")
         
     return args
 
-def determine_subgroup_by_index(current_idx):
-    bin_size = 531
+def determine_subgroup_by_index(current_idx, bin_size=531):
     bin_number = current_idx // bin_size
     subgroups = ["2 digit", "3 digit", "4 digit", "4+ digit", "1dp", "2dp", "4+ digit hard", "1dp random", "2dp random"]
-    return subgroups[bin_number] if bin_number < len(subgroups) else "2dp random"
+    return subgroups[bin_number] if bin_number < len(subgroups) else "unknown"
 
 def determine_operation_type(equation_str):
     if "+" in equation_str: return "addition"
@@ -42,8 +48,8 @@ def determine_operation_type(equation_str):
 def extract_clean_digits(text):
     return "".join([c for c in text if c.isdigit() or c in [".", "-"]])
 
-def format_prompt_by_type(raw_equation_str):
-    cleaned = raw_equation_str.strip()
+def format_prompt_by_type(raw_prompt):
+    cleaned = raw_prompt.strip()
     if re.search(r'[a-zA-Z]{2,}', cleaned): return f"Give the final answer only. {cleaned} Answer: "
     if cleaned.startswith("(") and cleaned.endswith(")"): cleaned = cleaned[1:-1].strip()
     return f"Give the final answer only. {cleaned} = "
@@ -62,7 +68,7 @@ def apply_nucleus_filter(logits, top_k_window=20, top_p=0.8, temperature=0.7):
     filter_mask[sorted_indices[sorted_indices_to_remove]] = float("-inf")
     return filter_mask
 
-def calculate_prefix_token_penalty(generated_tokens, gold_tokens):
+def calculate_prefix_token_match(generated_tokens, gold_tokens):
     match_count = 0
     for g_t, gold_t in zip(generated_tokens, gold_tokens):
         if g_t == gold_t: match_count += 1
@@ -111,12 +117,17 @@ def main():
         if token_id < mask_len and numeric_mask[token_id].item() == 1.0:
             numeric_vocab_dump[int(token_id)] = tokenizer.decode([token_id])
             
-    vocab_output_file = args.output_file.replace("inference_data_", "numeric_vocab_")
+    output_basename = os.path.basename(args.output_file)
+    if output_basename.startswith("inference_data_"):
+        output_basename = output_basename[len("inference_data_"):]
+    vocab_output_file = os.path.join(
+        os.path.dirname(args.output_file), f"numeric_vocab_{output_basename}"
+    )
     print(f"Saving compiled numeric vocabulary matrix to: {vocab_output_file}")
     with open(vocab_output_file, "w", encoding="utf-8") as f:
         json.dump(numeric_vocab_dump, f, indent=2, ensure_ascii=False, sort_keys=True)
 
-    subgroups = ["2 digit", "3 digit", "4 digit", "4+ digit", "1dp", "2dp", "4+ digit hard", "1dp random", "2dp random"]
+    subgroups = ["2 digit", "3 digit", "4 digit", "4+ digit", "1dp", "2dp", "4+ digit hard", "1dp random", "2dp random", "unknown"]
     subgroup_metrics = {
         sg: {
             "total": 0, "base_success": 0, "multi_layer_str_success": 0, "top_k_str_success": 0,
@@ -126,15 +137,19 @@ def main():
     }
     
     total_valid_items = 0
+    skipped_items = 0
     eval_results, valid_item_index = [], 0
 
-    for line in tqdm(lines, desc="Evaluating"):
+    for line_number, line in enumerate(tqdm(lines, desc="Evaluating"), start=1):
         try:
             data = json.loads(line)
             raw_prompt, raw_eqn, true_ans_str = data[args.type], data["equation"], str(data["answer"]).strip()
-        except: continue
+        except (json.JSONDecodeError, KeyError, TypeError, AttributeError) as error:
+            skipped_items += 1
+            print(f"Skipping invalid dataset line {line_number}: {error}")
+            continue
 
-        sg_type = determine_subgroup_by_index(valid_item_index)
+        sg_type = determine_subgroup_by_index(valid_item_index, args.subgroup_size)
         op_type = determine_operation_type(raw_eqn)
         gold_digits_len = len("".join([c for c in true_ans_str if c.isdigit()]))
 
@@ -314,7 +329,10 @@ def main():
                     tk_predictions_per_step.append([])
                 else:
                     tk_filtered = apply_nucleus_filter(tk_logits)
-                    top_k_preds = torch.topk(tk_filtered, k=args.top_k).indices.tolist()
+                    valid_top_k_count = int(torch.isfinite(tk_filtered).sum().item())
+                    top_k_preds = torch.topk(
+                        tk_filtered, k=min(args.top_k, valid_top_k_count)
+                    ).indices.tolist()
                     
                     # Log metrics for ALL Top-K options extracted from the final prediction layer
                     step_top_k_details = []
@@ -358,8 +376,10 @@ def main():
         ml_str_success = (ml_generated_str == true_ans_no_comma) if true_ans_no_comma else False
         top_k_str_success = (tk_generated_str == true_ans_no_comma) if true_ans_no_comma else False
         
-        ml_terminated_cleanly = ml_str_success and (ml_tokens_generated[-1] == tokenizer.eos_token_id or extract_clean_digits(tokenizer.decode([ml_tokens_generated[-1]])) == "")
-        tk_terminated_cleanly = top_k_str_success and (tk_tokens_generated[-1] == tokenizer.eos_token_id or extract_clean_digits(tokenizer.decode([tk_tokens_generated[-1]])) == "")
+        # These routes stop when the numeric answer is reached; they do not
+        # generate a separate EOS token, so EOS termination is not observed.
+        ml_terminated_cleanly = None
+        tk_terminated_cleanly = None
 
         ml_has_prefix_artifact = ml_str_success and len(ml_tokens_generated) > 0 and bool(re.match(r'^\D', tokenizer.decode([ml_tokens_generated[0]])))
         tk_has_prefix_artifact = top_k_str_success and len(tk_tokens_generated) > 0 and bool(re.match(r'^\D', tokenizer.decode([tk_tokens_generated[0]])))
@@ -369,7 +389,7 @@ def main():
 
         for route, g_str, t_gen in [("base", base_clean_ans, base_tokens_generated), ("ml", ml_generated_str, ml_tokens_generated), ("tk", tk_generated_str, tk_tokens_generated)]:
             dn, dd = calculate_digit_accuracy(g_str, true_ans_no_comma)
-            tn, td = calculate_prefix_token_penalty(t_gen, gold_token_ids)
+            tn, td = calculate_prefix_token_match(t_gen, gold_token_ids)
             subgroup_metrics[sg_type][f"{route}_digit_num"] += dn; subgroup_metrics[sg_type][f"{route}_digit_den"] += dd
             subgroup_metrics[sg_type][f"{route}_tok_num"] += tn; subgroup_metrics[sg_type][f"{route}_tok_den"] += td
 
@@ -384,9 +404,11 @@ def main():
                 "tk_failure_step": tk_failure_step
             },
             "termination_analysis": {
+                "ml_answer_reached": ml_str_success,
                 "ml_terminated_cleanly": ml_terminated_cleanly,
                 "ml_has_prefix_artifact": ml_has_prefix_artifact,
                 "ml_valid_terminating_layers": ml_terminating_layers if ml_terminating_layers is not None else [],
+                "tk_answer_reached": top_k_str_success,
                 "tk_terminated_cleanly": tk_terminated_cleanly,
                 "tk_has_prefix_artifact": tk_has_prefix_artifact,
                 "tk_valid_terminating_layers": tk_terminating_layers if tk_terminating_layers is not None else []
@@ -439,6 +461,8 @@ def main():
     print(f"{'GLOBAL MEAN':16} | {(g['bs']/g['tot'])*100:6.1f}% | {(g['bdn']/g['bdd'])*100:6.1f}% | {(g['btn']/g['btd'])*100:7.1f}% | {(g['ms']/g['tot'])*100:5.1f}% | {(g['mdn']/g['mdd'])*100:5.1f}% | {(g['mtn']/g['mtd'])*100:6.1f}% | {(g['ts']/g['tot'])*100:7.1f}% | {(g['tdn']/g['tdd'])*100:7.1f}% | {(g['ttn']/g['ttd'])*100:8.1f}%")
     print("=" * 135)
     
+    if skipped_items:
+        print(f"Skipped {skipped_items} invalid dataset line(s).")
     print(f"Saving fully instrumented compiled matrix: {args.output_file}")
     with open(args.output_file, "w", encoding="utf-8") as f: json.dump(eval_results, f, indent=2, ensure_ascii=False)
 
