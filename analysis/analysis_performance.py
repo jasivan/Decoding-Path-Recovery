@@ -15,7 +15,7 @@ plt.rcParams.update({
     'axes.linewidth': 1.5
 })
 
-OUTPUT_DIR = "inference_eos_uni"
+OUTPUT_DIR = "evaluation_results"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def clean_subgroup_string(raw_val):
@@ -29,7 +29,7 @@ def clean_subgroup_string(raw_val):
     if "2dp" in s: return "2dp"
     return str(raw_val).strip()
 
-def parse_dataset_features(data_dir="inference_eos_uni"):
+def parse_dataset_features(data_dir="evaluation_results"):
     """Sweeps json logs and maps exact base_str_match, ml_str_match, and tk_str_match keys."""
     records = []
     file_pattern = os.path.join(data_dir, "inference_data_*.json")
@@ -247,7 +247,7 @@ def plot_stacked_distribution_grid(df, model_name="Qwen3-14B"):
     print(f" -> Successfully generated top-down ordered distribution grid: {out_path}")
 
 if __name__ == "__main__":
-    master_df = parse_dataset_features("inference_eos_uni")
+    master_df = parse_dataset_features("evaluation_results")
     if not master_df.empty:
         for model in master_df["Model"].unique():
             plot_stacked_distribution_grid(master_df, model_name=model)

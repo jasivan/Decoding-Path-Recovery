@@ -16,7 +16,7 @@ plt.rcParams.update({
     'axes.linewidth': 1.5
 })
 
-OUTPUT_DIR = "inference_eos_uni"
+OUTPUT_DIR = "evaluation_results"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def parse_multi_model_normalized_layers(data_dir="."):
@@ -193,5 +193,5 @@ def plot_cross_model_alignment_late_layers(df, min_pct_cutoff=50.0):
 
 if __name__ == "__main__":
     print("Parsing model logs and organizing layer matrices...")
-    normalized_df = parse_multi_model_normalized_layers("inference_eos_uni")
+    normalized_df = parse_multi_model_normalized_layers("evaluation_results")
     plot_cross_model_alignment_late_layers(normalized_df, min_pct_cutoff=50.0)

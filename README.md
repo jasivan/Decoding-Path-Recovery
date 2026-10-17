@@ -26,10 +26,10 @@ python inference.py \
 	--model meta-llama/Llama-3.2-3B-Instruct \
 	--dataset /path/to/FERMAT_all.json \
 	--type question \
-	--output_file inference_eos_uni/inference_data_llama_fermat_question.json
+	--output_file evaluation_results/inference_data_llama_fermat_question.json
 ```
 
-Analysis scripts read JSON results from `inference_eos_uni` and can be run individually, for example:
+Analysis scripts read JSON results from `evaluation_results` and can be run individually, for example:
 
 ```bash
 python analysis/analysis_recovery.py
@@ -77,6 +77,7 @@ For questions about the paper or this repository, contact:
 ```text
 ├── analysis/               # Evaluation scripts used to generate graphs and tables
 ├── inference.py            # Main entry point to execute the evaluation on LLMs
+├── evaluation_results/     # Sample and generated evaluation results
 ├── .gitignore              # Excludes generated results and local artifacts
 ├── CITATION.cff             # Machine-readable citation metadata
 ├── requirements.txt         # Python dependencies

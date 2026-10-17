@@ -6,7 +6,7 @@ import pandas as pd
 from collections import Counter, defaultdict
 
 # --- GLOBAL DIR SETTINGS ---
-DATA_DIR = "inference_eos_uni"
+DATA_DIR = "evaluation_results"
 OUTPUT_CSV = os.path.join(DATA_DIR, "model_diagnostic_report.csv")
 
 def clean_model_name(filename):

@@ -6,7 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-def extract_specific_comparison_data(data_dir="inference_eos_uni"):
+def extract_specific_comparison_data(data_dir="evaluation_results"):
     prob_records = []
     layer_acc_records = []
     
@@ -221,5 +221,5 @@ def render_focused_comparison_plot(df_prob, df_acc, data_dir="."):
     
 if __name__ == '__main__':
     # Adjust path if data directory points elsewhere
-    dp, da = extract_specific_comparison_data("inference_eos_uni")
-    render_focused_comparison_plot(dp, da, "inference_eos_uni")
+    dp, da = extract_specific_comparison_data("evaluation_results")
+    render_focused_comparison_plot(dp, da, "evaluation_results")

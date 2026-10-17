@@ -8,9 +8,9 @@ venv/
 env/
 
 # Generated inference and analysis outputs
-inference_eos_uni/*.json
-inference_eos_uni/*.csv
-inference_eos_uni/*.png
+evaluation_results/*.json
+evaluation_results/*.csv
+evaluation_results/*.png
 *.log
 slurm-*.out
 

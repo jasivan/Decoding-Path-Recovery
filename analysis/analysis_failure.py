@@ -14,10 +14,10 @@ plt.rcParams.update({
     'axes.linewidth': 1.2
 })
 
-OUTPUT_DIR = "inference_eos_uni"
+OUTPUT_DIR = "evaluation_results"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-def analyze_rank_distributions(data_dir="inference_eos_uni"):
+def analyze_rank_distributions(data_dir="evaluation_results"):
     """Scans JSON logs to calculate the conditional vocabulary rank distribution
        separately for First, Middle, and End token failure types.
     """
@@ -205,5 +205,5 @@ def plot_composite_stacked_ranks(rank_counters):
 
 if __name__ == "__main__":
     print("Extracting token rank sequences...")
-    counters = analyze_rank_distributions("inference_eos_uni")
+    counters = analyze_rank_distributions("evaluation_results")
     plot_composite_stacked_ranks(counters)

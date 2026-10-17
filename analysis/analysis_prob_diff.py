@@ -16,10 +16,10 @@ plt.rcParams.update({
     'axes.linewidth': 1.5
 })
 
-OUTPUT_DIR = "inference_eos_uni"
+OUTPUT_DIR = "evaluation_results"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-def parse_margin_metrics(data_dir="inference_eos_uni"):
+def parse_margin_metrics(data_dir="evaluation_results"):
     """Extracts step-0 layer metrics, isolating both the Top-1/Top-2 margin
        and the specific Chosen vs. Gold token discrepancy for incorrect tracking paths.
     """
@@ -222,7 +222,7 @@ def plot_cross_model_worded_margin_grid(df, num_last_layers=15):
 
 if __name__ == "__main__":
     print("Parsing inference metrics directory data...")
-    margin_df = parse_margin_metrics("inference_eos_uni")
+    margin_df = parse_margin_metrics("evaluation_results")
     
     if not margin_df.empty:
         print("Generating decoupled cross-model comparison for Symbolic Equation...")

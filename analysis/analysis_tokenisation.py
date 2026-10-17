@@ -16,7 +16,7 @@ plt.rcParams.update({
     'axes.linewidth': 1.5
 })
 
-OUTPUT_DIR = "inference_eos_uni"
+OUTPUT_DIR = "evaluation_results"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def clean_subgroup_string(raw_val):
@@ -200,6 +200,6 @@ def generate_unified_grid(df):
 
 if __name__ == "__main__":
     print("Beginning multi-model matrix execution loop...")
-    master_df = parse_tokenization_features("inference_eos_uni")
+    master_df = parse_tokenization_features("evaluation_results")
     if not master_df.empty:
         generate_unified_grid(master_df)

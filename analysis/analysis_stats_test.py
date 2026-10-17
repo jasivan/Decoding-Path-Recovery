@@ -10,7 +10,7 @@ from statsmodels.stats.contingency_tables import mcnemar
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-def export_visual_results_panes(summary_report_data, data_dir="inference_eos_uni"):
+def export_visual_results_panes(summary_report_data, data_dir="evaluation_results"):
     if not summary_report_data:
         return
         
@@ -217,7 +217,7 @@ def execute_paired_tests(baseline_bin, oracle_bin, baseline_dig, oracle_dig, bas
 # =========================================================================
 # 3. INTERVENE, GROUP, AND EXTRACT PIPELINE
 # =========================================================================
-def run_granular_statistical_analysis(data_dir="inference_eos_uni"):
+def run_granular_statistical_analysis(data_dir="evaluation_results"):
     scenarios = {
         "Worded Questions (Fixed Set)": os.path.join(data_dir, "inference_*_fixed.json"),
         "Symbolic Equations (Hard Set)": os.path.join(data_dir, "inference_*_hard.json")

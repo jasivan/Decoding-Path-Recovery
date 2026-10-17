@@ -24,7 +24,7 @@ def parse_args():
     if args.output_file is None:
         model_clean = args.model.split("/")[-1]
         dataset_clean = os.path.splitext(os.path.basename(args.dataset))[0]
-        args.output_file = f"inference_eos_uni/inference_data_{model_clean}_{dataset_clean}_{args.type}.json"
+        args.output_file = f"evaluation_results/inference_data_{model_clean}_{dataset_clean}_{args.type}.json"
 
     if args.top_k < 1:
         parser.error("--top_k must be at least 1")

@@ -15,7 +15,7 @@ DESIRED_MODEL_ORDER = [
     "llama-3.1-8B",
 ]
 
-def calculate_tk_rank_impact(data_dir="inference_eos_uni"):
+def calculate_tk_rank_impact(data_dir="evaluation_results"):
     file_pattern = os.path.join(data_dir, "inference_data_*_hard.json")
     files = glob.glob(file_pattern)
     
