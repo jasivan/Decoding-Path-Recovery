@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this repository, please cite the associated paper."
+title: "Decoding Path Recovery in Number Generation: Shifting to Intermediate Layers and Top-k Ranks"
+type: software
+license: CC-BY-4.0
+authors:
+  - family-names: Sivakumar
+    given-names: "Jasivan Alex"
+    email: jasivakumar1@sheffield.ac.uk
+  - family-names: Moosavi
+    given-names: "Nafise Sadat"
+    email: n.s.moosavi@sheffield.ac.uk
+version: "1.0.0"
+date-released: 2026-10-17
+url: "https://2026.inlgmeeting.org/static/proceedings/long/watermarked_pdfs/45.pdf"
+preferred-citation:
+  type: article
+  title: "Decoding Path Recovery in Number Generation: Shifting to Intermediate Layers and Top-k Ranks"
+  authors:
+    - family-names: Sivakumar
+      given-names: "Jasivan Alex"
+    - family-names: Moosavi
+      given-names: "Nafise Sadat"
+  year: 2026
+  journal: "Proceedings of the 19th International Natural Language Generation Conference"
+  start: 799
+  end: 814
+  publisher: "Association for Computational Linguistics"
+  url: "https://2026.inlgmeeting.org/static/proceedings/long/watermarked_pdfs/45.pdf"

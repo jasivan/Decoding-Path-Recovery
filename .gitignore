@@ -1,1 +1,28 @@
+# Python caches and local environments
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+env/
+
+# Generated inference and analysis outputs
+inference_eos_uni/*.json
+inference_eos_uni/*.csv
+inference_eos_uni/*.png
+*.log
+slurm-*.out
+
+# Local experiment and model artifacts
+wandb/
+checkpoints/
+trained_models/
+*.safetensors
+*.pt
+*.pth
+
+# Notebook and editor metadata
+.ipynb_checkpoints/
+.vscode/
 

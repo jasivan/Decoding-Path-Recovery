@@ -88,6 +88,9 @@ def build_numeric_vocabulary_mask(tokenizer, model, device):
 
 def main():
     args = parse_args()
+    output_dir = os.path.dirname(args.output_file)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     
     tokenizer = AutoTokenizer.from_pretrained(args.model, trust_remote_code=True)
